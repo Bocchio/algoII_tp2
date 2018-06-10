@@ -1,0 +1,251 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}
+ \usepackage[T1]{fontenc}
+
+\usepackage[spanish]{babel}
+\usepackage{flushend}
+
+\usepackage[left=2cm,top=1.8cm,right=2cm,bottom=1.8cm]{geometry}
+\usepackage{geometry}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{verbatim}
+\usepackage{lineno} %enumerar las lineas
+\renewcommand\linenumberfont{\normalfont\small}
+\setlength\linenumbersep{.5cm} %distancia al margen de los numeros
+\usepackage{float}
+\usepackage{array}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{booktabs}%para tablas más copadas
+\usepackage[small,bf,width=0.7\textwidth,labelsep=period]{caption}%para tablas más copadas
+\usepackage{subfigure}
+\usepackage{mathtools}  % dcases
+\usepackage{fancyhdr}
+\usepackage{emptypage}
+%\usepackage[amssymb]{SIunits}%unidades
+\usepackage[version-1-compatibility]{siunitx}
+\usepackage{amsmath}
+%\usepackage{booktabs}
+%\usepackage{cancel}
+%\usepackage{cleveref}
+%\usepackage{colortbl}
+%\usepackage{csquotes}
+%\usepackage{helvet}
+%\usepackage{mathpazo}
+%\usepackage{multirow}
+%\usepackage{listings}
+%\usepackage{pgfplots}
+\usepackage{circuitikz}
+\usepackage{tikz}
+%++++++++++++++++++++++++++++++++++
+%para agregar codigos de programas:
+\usepackage{listings}
+
+\lstset{literate=
+  {¡}{{!`}}1  {¿}{{¿`}}1
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
+}
+
+\lstset{extendedchars=\true,
+    linewidth=\textwidth,
+    inputencoding=utf8x,
+    language=[ANSI]C,
+    xleftmargin=5pt,
+    xrightmargin=5pt,
+    breaklines=true,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbers=left,%          Que haya números a la izquierda (número de linea)
+    numbersep=5pt,
+    tabsize=4,showtabs=false,
+    basicstyle=\ttfamily\small,%    Estilo básico de la tipografía del código
+    commentstyle=\color{Gray},%     Color de los comentarios
+    showstringspaces=false,%        Los espacios no se ven de forma especial
+    %stringstyle=\color{BrickRed},%  Estilo de las cadenas
+    %keywordstyle=\color{ForestGreen},%  Estilo de las palabras reservadas
+    morekeywords=[1]{size_t,ssize_t},%  Definición de más palabras reservadas
+    deletekeywords={typedef,enum,do,while,if,else,for,case,default,switch,break,continue},%
+        keywords=[2]{typedef,enum,do,while,if,else,for,case,default,switch,break,continue,EXIT_SUCCESS,EXIT_FAILURE},
+    %keywordstyle=[2]{\color{BurntOrange}},% 2do grupo de palabras reservadas
+        directives={define,undef,include,if,else,ifndef,ifdef,elif,endif},%
+    %directivestyle=\color{NavyBlue},%       Estilo de directivas
+    keywords=[3]{define,undef,include,if,else,ifndef,ifdef,elif,endif},%
+    %keywordstyle=[3]{\color{MidnightBlue}},%3er grupo de palabras reservadas
+    morecomment=[s][\color{Gray}]{/*}{*/}%  Definición de estilo de comentario
+    }
+
+%++++++++++++++++++++++++++++++++++
+\usepackage{color}
+\definecolor{Apricot}{RGB}{253,199,130}
+\definecolor{Aquamarine}{RGB}{0,181,202}
+\definecolor{Bittersweet}{RGB}{192,79,23}
+\definecolor{Black}{RGB}{0,0,0}
+\definecolor{Blue}{RGB}{0,0,255}
+\definecolor{BlueGreen}{RGB}{0,179,184}
+\definecolor{BlueViolet}{RGB}{71,57,146}
+\definecolor{BrickRed}{RGB}{182,50,28}
+\definecolor{Brown}{RGB}{121,37,0}
+\definecolor{BurntOrange}{RGB}{247,146,29}
+\definecolor{CadetBlue}{RGB}{116,114,154}
+\definecolor{CarnationPink}{RGB}{242,130,180}
+\definecolor{Cerulean}{RGB}{0,162,227}
+\definecolor{CornflowerBlue}{RGB}{65,176,228}
+\definecolor{Cyan}{RGB}{0,174,239}
+\definecolor{Dandelion}{RGB}{253,188,66}
+\definecolor{DarkOrchid}{RGB}{164,83,138}
+\definecolor{Emerald}{RGB}{0,169,157}
+\definecolor{ForestGreen}{RGB}{0,155,85}
+\definecolor{Fuchsia}{RGB}{140,54,140}
+\definecolor{Goldenrod}{RGB}{255,223,66}
+\definecolor{Gray}{RGB}{148,150,152}
+\definecolor{Green}{RGB}{0,166,79}
+\definecolor{GreenYellow}{RGB}{223,230,116}
+\definecolor{JungleGreen}{RGB}{0,169,154}
+\definecolor{Lavender}{RGB}{244,158,196}
+\definecolor{LimeGreen}{RGB}{141,199,62}
+\definecolor{Magenta}{RGB}{236,0,140}
+\definecolor{Mahogany}{RGB}{169,52,31}
+\definecolor{Maroon}{RGB}{175,50,53}
+\definecolor{Melon}{RGB}{248,158,123}
+\definecolor{MidnightBlue}{RGB}{0,103,149}
+\definecolor{Mulberry}{RGB}{169,60,147}
+\definecolor{NavyBlue}{RGB}{0,103,149}
+\definecolor{OliveGreen}{RGB}{60,128,49}
+\definecolor{Orange}{RGB}{245,129,55}
+\definecolor{OrangeRed}{RGB}{237,19,90}
+\definecolor{Orchid}{RGB}{175,114,176}
+\definecolor{Peach}{RGB}{247,150,90}
+\definecolor{Periwinkle}{RGB}{121,119,184}
+\definecolor{PineGreen}{RGB}{0,139,114}
+\definecolor{Plum}{RGB}{146,38,143}
+\definecolor{ProcessBlue}{RGB}{0,176,240}
+\definecolor{Purple}{RGB}{153,71,155}
+\definecolor{RawSienna}{RGB}{151,64,6}
+\definecolor{Red}{RGB}{237,27,35}
+\definecolor{RedOrange}{RGB}{242,96,70}
+\definecolor{RedViolet}{RGB}{161,36,107}
+\definecolor{Rhodamine}{RGB}{239,85,159}
+\definecolor{RoyalBlue}{RGB}{0,113,188}
+\definecolor{RoyalPurple}{RGB}{97,63,153}
+\definecolor{RubineRed}{RGB}{237,1,125}
+\definecolor{Salmon}{RGB}{246,146,137}
+\definecolor{SeaGreen}{RGB}{63,188,157}
+\definecolor{Sepia}{RGB}{103,24,0}
+\definecolor{SkyBlue}{RGB}{70,197,221}
+\definecolor{SpringGreen}{RGB}{198,220,103}
+\definecolor{Tan}{RGB}{218,157,118}
+\definecolor{TealBlue}{RGB}{0,174,179}
+\definecolor{Thistle}{RGB}{216,131,183}
+\definecolor{Turquoise}{RGB}{0,180,206}
+\definecolor{Violet}{RGB}{88,66,155}
+\definecolor{VioletRed}{RGB}{239,88,160}
+\definecolor{White}{RGB}{255,255,255}
+\definecolor{WildStrawberry}{RGB}{238,41,103}
+\definecolor{Yellow}{RGB}{255,242,0}
+\definecolor{YellowGreen}{RGB}{152,204,112}
+\definecolor{YellowOrange}{RGB}{250,162,26}
+
+%++++++++++++++++++++++++++++++++++
+
+%\usepackage{hyperref}
+%\sisetup{separate-uncertainty}% para tener el +/- con los (); ejemplo 33(2)
+
+
+%cabecera y pie de pagina
+%\pagestyle{fancy}
+%\lhead{}
+%\chead{}
+%\rhead{Facultad de Ingeniería - Universidad de Buenos Aires\\ Trabajo filtro Baxandall\\ \textbf{Juan Pablo Quiroga} - Padrón: 98040}
+%\renewcommand{\headrulewidth}{0.5pt}
+%\lfoot[a1]{}
+%\cfoot[c1]{}
+%\rfoot[RE]{}
+%\renewcommand{\footrulewidth}{.5pt}
+
+\begin{document}
+
+%\thispagestyle{plain}
+%\thispagestyle{}
+%\headings
+
+
+\pagestyle{fancy}
+%\renewcommand{\sectionmark}[1]{\markboth{}{\thesection\ \ #1}}
+\lhead{13-05-17}
+\chead{\textbf{Ejercicios Mart\'in}}
+\rhead{95.11 - Algoritmos y Programaci\'on I}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+
+\begin{comment}
+%
+% Carátula:
+%
+\begin{titlepage}
+
+\thispagestyle{empty}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{fiuba.jpg}
+\end{center}
+
+\vfill
+
+\begin{center} % Modificar el código de ser necesario
+\Large{\underline{\textsc{Algoritmos y Programación I (95.11)}}}
+\end{center}
+
+\vfill
+
+\begin{tabbing}
+\hspace{2cm}\=\+ CASO DE ESTUDIO N.º1 \\
+    TEMA: Programa de cálculo para control de tonos\\
+    FECHA: 5 de Octubre\\% \today\\
+\\
+    INTEGRANTES:\hspace{-1cm}\=\+\hspace{1cm}\=\hspace{6cm}\=\\
+        Quiroga, Juan Pablo \>\>- \# 98040\\
+            \>\footnotesize{\verb!<quirogajuanp@gmail.com>!}\\
+        %APELLIDO2, Nombre2 \>\>- \#88888\\
+        %   \>\footnotesize{\verb!<nombre2_apellido2@dominio.com>!}\\
+        %APELLIDO3, Nombre3 \>\>- \#88888\\
+        %   \>\footnotesize{\verb!<nombre3_apellido3@dominio.com>!}\\
+\end{tabbing}
+
+\vfill
+
+\hrule
+\vspace{0.2cm}
+
+% Modificar código de ser necesario
+\noindent\small{95.11 - Algoritmos y Programación I \hfill Ing. Martín Cardozo}
+
+\end{titlepage}
+
+
+\newpage
+\end{comment}
+
+\lstinputlisting{ejemplo85.c}
+
+\lstinputlisting{ejemplo88.c}
+
+\lstinputlisting{ejemplo207.c}
+
+
+    
+\end{document}
+
