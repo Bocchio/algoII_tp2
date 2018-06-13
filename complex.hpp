@@ -78,6 +78,10 @@ class Complex{
         return 0;  // actually undefined
     }
 
+    Complex getConjugate() {
+        return Complex(real, -imag);
+    }
+
     Complex& operator=(const Complex& r) {
         real = r.real;
         imag = r.imag;

@@ -29,6 +29,8 @@ using std::string;
 static void opt_input(string const &);
 static void opt_output(string const &);
 static void opt_method(string const &);
+static void opt_regression(string const &);
+static void opt_error(string const &);
 static void opt_help(string const &);
 
 // syntax: {needs argument,
@@ -41,6 +43,8 @@ static option_t options[] = {
     {1, "i", "input", "-", opt_input, OPT_DEFAULT},
     {1, "o", "output", "-", opt_output, OPT_DEFAULT},
     {1, "m", "method", "FFT", opt_method, OPT_DEFAULT},
+    {1, "r", "regression", NULL, opt_regression, OPT_DEFAULT},
+    {1, "e", "error", NULL, opt_error, OPT_DEFAULT},
     {0, "h", "help", NULL, opt_help, OPT_DEFAULT},
     {0, },
 };
@@ -97,6 +101,14 @@ static void opt_method(const string& method) {
     FT = method_lookup_table[method]();
 }
 
+static void opt_regression(string const &arg) {
+    ;
+}
+
+static void opt_error(string const &arg) {
+    ;
+}
+
 static void opt_help(string const &arg) {
     cout << HELP_MSG
          << endl;
@@ -113,7 +125,25 @@ int main(int argc, char * const argv[]) {
         cerr << ERROR_MSG_CORRUPTED_DATA << endl;
     }
 
-    *oss << FT->transform(v) << endl;
+    v = FT->transform(v);
+
+    // if (regression) {
+    //     double relative_error = 0;
+    //     double regression_square_sum = 0;
+    //     for (size_t i = 0; i < regressions.getSize(); i++) {
+    //         square_difference = (v[i]-regressions[i]);
+    //         square_difference = square_difference*square_difference.getConjugate();
+
+    //         regression_square_sum += regressions[i]*regressions[i].getConjugate();
+
+    //         relative_error += square_difference;
+    //     }
+    //     relative_error = sqrt(relative_error/regression_square_sum);
+
+    //     if (relative_error < error) {
+    //         exit(0);
+    //     }
+    // }
 
     delete FT;
 
