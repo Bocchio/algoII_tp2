@@ -100,10 +100,10 @@ static void opt_output(string const &arg) {
 }
 
 static void opt_method(const string& method) {
-    method_lookup_table["FFT"] = constructorFrom<FFT>;
-    method_lookup_table["IFFT"] = constructorFrom<IFFT>;
-    method_lookup_table["DFT"] = constructorFrom<DFT>;
-    method_lookup_table["IDFT"] = constructorFrom<IDFT>;
+    method_lookup_table.add("FFT", constructorFrom<FFT>);
+    method_lookup_table.add("IFFT", constructorFrom<IFFT>);
+    method_lookup_table.add("DFT", constructorFrom<DFT>);
+    method_lookup_table.add("IDFT", constructorFrom<IDFT>);
 
     FT = method_lookup_table[method]();
 }
@@ -163,7 +163,7 @@ int main(int argc, char * const argv[]) {
             if ((*regressions_stream >> regressions).bad()) {
                 cerr << ERROR_MSG_CORRUPTED_DATA << endl;
             }
-            if (!*regressions_stream)
+            if (v.getSize() == 0)
                 break;
 
             v = FT->transform(v);

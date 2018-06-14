@@ -2,7 +2,12 @@
 #define COMPLEX_HPP__
 
 #include <iostream>
-#include <cmath>
+#ifdef _WIN32
+    #define _USE_MATH_DEFINES
+    #include <math.h>
+#else
+    #include <cmath>
+#endif
 
 using std::cout;
 using std::endl;

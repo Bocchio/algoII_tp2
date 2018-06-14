@@ -2,7 +2,14 @@
 #define FT_HPP__
 
 #include <cfloat>
-#include <cmath>
+
+#ifdef _WIN32
+    #define _USE_MATH_DEFINES
+    #include <math.h>
+#else
+    #include <cmath>
+#endif
+
 #include <iostream>
 #include "vector.hpp"
 #include "complex.hpp"
@@ -40,12 +47,18 @@ class FourierTransform {
     Vector<Complex> W;
  public:
     FourierTransform() {
-        size_t limite = 1024;
-        double theta = (2*M_PI)/limite;
-        for (size_t i = 0; i < limite; i++) {
+        resizeW(1024);
+    }
+
+    void resizeW(size_t new_size){
+        W = Vector<Complex>();
+        new_size = 1 << (size_t) ceil(log2(new_size));
+        double theta = (2*M_PI)/new_size;
+        for (size_t i = 0; i < new_size; i++) {
             W.append(Complex(cos(i*theta), sin(i*theta)));
         }
     }
+
     virtual ~FourierTransform() {}
     virtual Vector<Complex> transform(const Vector<Complex>& x) = 0;
 };
@@ -64,6 +77,8 @@ class DFT: public FourierTransform {
             y.append(Complex());
         }
         Vector<Complex> original_vector = y;
+        if (N > W.getSize())
+            resizeW(N);
 
         Vector<Complex> Wn = W.slice(0, W.getSize(), W.getSize()/N);
         for (size_t yi = 0; yi < N; ++yi) {
@@ -91,6 +106,8 @@ class IDFT: public FourierTransform {
             y.append(Complex());
         }
         Vector<Complex> original_vector = y;
+        if (N > W.getSize())
+            resizeW(N);
 
         Vector<Complex> Wn = W.slice(0, W.getSize(), W.getSize()/N);
         for (Vector<Complex>::iterator yi = y.begin(); yi != y.end(); ++yi) {
@@ -110,6 +127,12 @@ class IDFT: public FourierTransform {
 class FFT: public FourierTransform {
  public:
     virtual Vector<Complex> transform(const Vector<Complex> &x) {
+        if (x.getSize() == 0)
+            return x;
+        size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+        if (N > W.getSize())
+            resizeW(N);
+
         return fft(x, W);
     }
 };
@@ -120,6 +143,9 @@ class IFFT: public FourierTransform {
         if (x.getSize() == 0)
             return x;
         size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+        if (N > W.getSize())
+            resizeW(N);
+
         return fft(x, W, -1)/N;
     }
 };

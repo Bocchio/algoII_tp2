@@ -32,7 +32,10 @@ class Dictionary {
         delete[] hashes;
     }
 
-    T& operator[](string key) {
+    void add(string key, const T& value) {
+        for (size_t i = 0; i < key.length(); i++)
+            key[i] = toupper(key[i]);
+
         long hash = Dictionary::hash(key);
         size_t pos = static_cast<size_t>(hash) % size;
 
@@ -44,10 +47,15 @@ class Dictionary {
             if (full == size)
                 throw std::overflow_error("The dictionary run out of space");
         }
-        return table[pos];
+        hashes[pos] = hash;
+        keys[pos] = key;
+        table[pos] = value;
     }
 
-    T& operator[](string key) const {
+    T& operator[](string key) {
+        for (size_t i = 0; i < key.length(); i++)
+            key[i] = toupper(key[i]);
+
         long hash = Dictionary::hash(key);
         size_t pos = static_cast<size_t>(hash) % size;
 

@@ -70,7 +70,7 @@ int main(int argc, char * const argv[]) {
 
     int max_size = 1000;
     float division_constant = 7;
-    for (size_t i = 1; i < 16385; i *= 2) {
+    for (size_t i = 32768; i >= 1; i /= 2) {  // 2^14 16385
         Vector<Complex> v;
         for (size_t j = 0, r = 1; j < i; j++) {
             srand((j+i+r)*(j+i+r));
