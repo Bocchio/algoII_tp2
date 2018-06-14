@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <cfloat>
 #include <string>
-
 #include <ctime>  // for timing purposes
 #include <vector>
 #include <complex>
@@ -16,6 +15,9 @@
 #include "ft.hpp"
 #include "errors.hpp"
 #include "dictionary.hpp"
+
+#define FLOAT_DIGITS 7
+#define DOUBLE_DIGITS 16
 
 using std::cout;
 using std::cin;
@@ -43,8 +45,8 @@ static option_t options[] = {
     {1, "i", "input", "-", opt_input, OPT_DEFAULT},
     {1, "o", "output", "-", opt_output, OPT_DEFAULT},
     {1, "m", "method", "FFT", opt_method, OPT_DEFAULT},
-    {1, "r", "regression", NULL, opt_regression, OPT_DEFAULT},
-    {1, "e", "error", NULL, opt_error, OPT_DEFAULT},
+    {1, "r", "regression", "", opt_regression, OPT_DEFAULT},
+    {1, "e", "error", "1e-3", opt_error, OPT_DEFAULT},
     {0, "h", "help", NULL, opt_help, OPT_DEFAULT},
     {0, },
 };
@@ -57,6 +59,11 @@ static fstream ifs;
 static fstream ofs;
 FourierTransform * FT;
 Dictionary<FourierTransform *(*)()> method_lookup_table;
+
+static istream *regressions_stream = 0;
+static fstream regressions_file_stream;
+static bool using_regression_file;
+static float error_threshold;
 
 static void opt_input(string const &arg) {
     if (arg == "-") {
@@ -102,11 +109,34 @@ static void opt_method(const string& method) {
 }
 
 static void opt_regression(string const &arg) {
-    ;
+    if (arg == "") {
+        using_regression_file = false;
+        return;
+    } else {
+        regressions_file_stream.open(arg.c_str(), ios::in);
+        regressions_stream = &regressions_file_stream;
+        using_regression_file = true;
+    }
+    if (!regressions_stream->good()) {
+        cerr << ERROR_MSG_CANT_OPEN_FILE
+             << arg
+             << "."
+             << endl;
+        exit(1);
+    }
 }
 
 static void opt_error(string const &arg) {
-    ;
+    char *tmp;
+
+    error_threshold = strtod(arg.c_str(), &tmp);
+    if(*tmp) {
+        cout << ERROR_MSG_INVALID_ARG
+             << arg
+             << endl;
+        exit(1);
+    }
+;
 }
 
 static void opt_help(string const &arg) {
@@ -125,25 +155,32 @@ int main(int argc, char * const argv[]) {
         cerr << ERROR_MSG_CORRUPTED_DATA << endl;
     }
 
-    v = FT->transform(v);
+    cout << std::setprecision(7) << std::fixed << FT->transform(v) << endl;
 
-    // if (regression) {
-    //     double relative_error = 0;
-    //     double regression_square_sum = 0;
-    //     for (size_t i = 0; i < regressions.getSize(); i++) {
-    //         square_difference = (v[i]-regressions[i]);
-    //         square_difference = square_difference*square_difference.getConjugate();
+    if (using_regression_file) {
+        Vector<Complex> regressions;
+        if ((*regressions_stream >> v).bad()) {
+            cerr << ERROR_MSG_CORRUPTED_DATA << endl;
+        }
 
-    //         regression_square_sum += regressions[i]*regressions[i].getConjugate();
+        double relative_error = 0;
+        double regression_square_sum = 0;
+        double square_difference = 0;
+        for (size_t i = 0; i < regressions.getSize(); i++) {
+            square_difference = ((v[i]-regressions[i])*((v[i]-regressions[i]).getConjugate()))
+                                .getReal();
 
-    //         relative_error += square_difference;
-    //     }
-    //     relative_error = sqrt(relative_error/regression_square_sum);
+            regression_square_sum += (regressions[i]*(regressions[i].getConjugate()))
+                                    .getReal();
 
-    //     if (relative_error < error) {
-    //         exit(0);
-    //     }
-    // }
+            relative_error += square_difference;
+        }
+        relative_error = sqrt(relative_error/regression_square_sum);
+
+        if (relative_error < error_threshold) {
+            exit(0);
+        }
+    }
 
     delete FT;
 

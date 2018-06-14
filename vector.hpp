@@ -6,6 +6,7 @@
 #include <utility>  // For swap
 #include <iostream>  // for stream manipulation
 #include <cmath>  // log2, ceil
+#include <cctype>
 
 #define SEPARATOR ", "
 
@@ -39,7 +40,7 @@ class Vector {
         if (new_size <= INIT_CHOP)
             _resize(INIT_CHOP);
         else  // Alloc size for the first (2^n)*INIT_CHOP bigger than new_size
-            _resize(INIT_CHOP*(1 << (size_t) ceil(log2(new_size)-log2(10))));
+            _resize(INIT_CHOP*(1 << (size_t) (ceil(log2(new_size)-log2(10)))));
     }
 
  public:
@@ -154,7 +155,7 @@ class Vector {
         return !(*this == r);
     }
 
-    Vector slice(size_t start, size_t slice_size, size_t stride) {
+    Vector slice(size_t start, size_t slice_size, size_t stride) const {
         Vector result;
 
         for (size_t i = start; i < slice_size; i += stride) {
@@ -183,6 +184,15 @@ class Vector {
         }
     }
 
+    // empties the vector
+    void empty() {
+        size = 0;
+        T *aux = new T[0];
+        delete []data;
+        data = aux;
+        resize(0);
+    }
+
     // Useful for the copy and swap idiom implementation of operator=
     void swap(Vector &r) throw() {
         using std::swap;
@@ -205,8 +215,14 @@ class Vector {
     }
 
     friend istream& operator>>(istream& is, Vector& r) {
+        char c;
         for (T t; is >> t;) {
             r.append(t);
+            while (is.good() && isspace(c = is.peek())) {
+                is.get();
+                if (c == '\n')
+                    return is;
+            }
         }
         return is;
     }

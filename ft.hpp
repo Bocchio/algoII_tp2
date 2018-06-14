@@ -8,40 +8,44 @@
 #include "complex.hpp"
 
 // Helper function, a generic implementation of the Cooley-Tukey fft algorithm
-static Vector<Complex> fft(const Vector<Complex>& x, double w = 2*M_PI) {
-    Vector<Complex> y = Vector<Complex>(x);
-    bool added_zero = false;
+static Vector<Complex> fft(const Vector<Complex>& x, const Vector<Complex> &W, double direction = 1) {
+    if (x.getSize() == 0 || x.getSize() == 1)
+        return x;
 
-    size_t N = y.getSize();
-    if (N == 1)
-        return y;
-    if (N % 2 == 1) {  // Fill with ceros if there's an odd size
-        y += Vector<Complex>().append(Complex());
-        N++;
-        added_zero = true;
+    Vector<Complex> y = Vector<Complex>(x);
+    // pad with 0s
+    size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+    for (size_t i = x.getSize(); i < N; i++) {
+        y.append(Complex());
     }
 
-    Vector<Complex> even = y.slice(0, -1, 2);  // take the even indexes
-    Vector<Complex> odd = y.slice(1, -1, 2);  // take the odd indexes
-    even = fft(even, w);
-    odd = fft(odd, w);
+    Vector<Complex> even = y.slice(0, N, 2);  // take the even indexes
+    Vector<Complex> odd = y.slice(1, N, 2);  // take the odd indexes
+    even = fft(even, W, direction);
+    odd = fft(odd, W, direction);
 
+    Vector<Complex> Wn = W.slice(0, W.getSize(), W.getSize()/N);
     for (size_t i = 0; i < N/2; ++i) {
-        double argument = -(w*i)/N;
-        Complex twiddle(cos(argument), sin(argument));
-        odd[i] *= twiddle;
+        odd[i] *= Wn[i];
 
         y[i] = even[i] + odd[i];
         y[i+N/2] = even[i] - odd[i];
     }
-    if (added_zero)
-       y.remove(N-1);
 
     return y;
 }
 
 class FourierTransform {
+ protected:
+    Vector<Complex> W;
  public:
+    FourierTransform() {
+        size_t limite = 1024;
+        double theta = (2*M_PI)/limite;
+        for (size_t i = 0; i < limite; i++) {
+            W.append(Complex(cos(i*theta), sin(i*theta)));
+        }
+    }
     virtual ~FourierTransform() {}
     virtual Vector<Complex> transform(const Vector<Complex>& x) = 0;
 };
@@ -51,18 +55,24 @@ class DFT: public FourierTransform {
     virtual Vector<Complex> transform(const Vector<Complex>& x) {
         Vector<Complex> y = Vector<Complex>(x);
 
-        size_t N = x.getSize();
-        double argument = -(2*M_PI)/N;
-        Complex wn(cos(argument), sin(argument));
+        if (x.getSize() == 0)
+            return y;
 
-        size_t y_size = y.getSize();
-        size_t x_size = x.getSize();
-        for (size_t yi = 0; yi < y_size; ++yi) {
+        // pad with 0s
+        size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+        for (size_t i = x.getSize(); i < N; i++) {
+            y.append(Complex());
+        }
+        Vector<Complex> original_vector = y;
+
+        Vector<Complex> Wn = W.slice(0, W.getSize(), W.getSize()/N);
+        for (size_t yi = 0; yi < N; ++yi) {
             y[yi] = Complex();
-            for (size_t xj = 0; xj < x_size; ++xj) {
-                y[yi] += x[xj]*(wn^(yi*xj));
+            for (size_t xj = 0; xj < N; ++xj) {
+                y[yi] += original_vector[xj]*(Wn[(yi*xj)%N]);
             }
         }
+
         return y;
     }
 };
@@ -72,18 +82,27 @@ class IDFT: public FourierTransform {
     virtual Vector<Complex> transform(const Vector<Complex>& x){
         Vector<Complex> y = Vector<Complex>(x);
 
-        size_t N = x.getSize();
-        double argument = (2*M_PI)/N;
-        Complex wn(cos(argument), sin(argument));
+        if (x.getSize() == 0)
+            return y;
+
+        // pad with 0s
+        size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+        for (size_t i = x.getSize(); i < N; i++) {
+            y.append(Complex());
+        }
+        Vector<Complex> original_vector = y;
+
+        Vector<Complex> Wn = W.slice(0, W.getSize(), W.getSize()/N);
         for (Vector<Complex>::iterator yi = y.begin(); yi != y.end(); ++yi) {
             size_t i = yi - y.begin();
             *yi = Complex();
-            for (Vector<Complex>::iterator xj = x.begin(); xj != x.end(); ++xj) {
-                size_t j = xj - x.begin();
-                *yi += (*xj)*(wn^(i*j));
+            for (Vector<Complex>::iterator xj = original_vector.begin(); xj != original_vector.end(); ++xj) {
+                size_t j = (size_t) (xj - original_vector.begin());
+                *yi += (*xj)*(Wn[(j*i)%N]);
             }
             *yi /= N;
         }
+
         return y;
     }
 };
@@ -91,14 +110,17 @@ class IDFT: public FourierTransform {
 class FFT: public FourierTransform {
  public:
     virtual Vector<Complex> transform(const Vector<Complex> &x) {
-        return fft(x);
+        return fft(x, W);
     }
 };
 
 class IFFT: public FourierTransform {
  public:
     virtual Vector<Complex> transform(const Vector<Complex> & x){
-        return fft(x, -2*M_PI)/x.getSize();
+        if (x.getSize() == 0)
+            return x;
+        size_t N = 1 << (size_t) ceil(log2(x.getSize()));
+        return fft(x, W, -1)/N;
     }
 };
 

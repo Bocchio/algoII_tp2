@@ -34,7 +34,7 @@ class Dictionary {
 
     T& operator[](string key) {
         long hash = Dictionary::hash(key);
-        size_t pos = hash % size;
+        size_t pos = static_cast<size_t>(hash) % size;
 
         // search a free pos
         for (size_t full = 0; hashes[pos] != FREE; pos = (pos+1)%size, ++full) {
@@ -49,7 +49,7 @@ class Dictionary {
 
     T& operator[](string key) const {
         long hash = Dictionary::hash(key);
-        size_t pos = hash % size;
+        size_t pos = static_cast<size_t>(hash) % size;
 
         for (size_t full = 0;
              (hashes[pos] != FREE) && (full != size);
