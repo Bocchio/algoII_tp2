@@ -10,4 +10,12 @@
 #define ERROR_MSG_MANDATORY_OPT     "Option is mandatory."
 #define HELP_MSG                    "cmdline [-i file] [-o file] [-m method]"
 
+#ifndef EXIT_FAILURE
+    #define EXIT_FAILURE 1
+#endif
+
+#ifndef EXIT_SUCCESS
+    #define EXIT_SUCCESS  0
+#endif
+
 #endif  // ERRORS_HPP__

@@ -149,40 +149,60 @@ int main(int argc, char * const argv[]) {
     cmdline cmdl(options);
     cmdl.parse(argc, argv);
 
-    Vector<Complex> v;
-
-    if ((*iss >> v).bad()) {
-        cerr << ERROR_MSG_CORRUPTED_DATA << endl;
-    }
-
-    cout << std::setprecision(7) << std::fixed << FT->transform(v) << endl;
+    size_t exit_code = EXIT_SUCCESS;
 
     if (using_regression_file) {
-        Vector<Complex> regressions;
-        if ((*regressions_stream >> v).bad()) {
-            cerr << ERROR_MSG_CORRUPTED_DATA << endl;
-        }
+        size_t test_number = 1;
+        string test_result;
+        while (*regressions_stream) {
+            Vector<Complex> v;
+            Vector<Complex> regressions;
+            if ((*iss >> v).bad()) {
+                cerr << ERROR_MSG_CORRUPTED_DATA << endl;
+            }
+            if ((*regressions_stream >> regressions).bad()) {
+                cerr << ERROR_MSG_CORRUPTED_DATA << endl;
+            }
+            if (!*regressions_stream)
+                break;
 
-        double relative_error = 0;
-        double regression_square_sum = 0;
-        double square_difference = 0;
-        for (size_t i = 0; i < regressions.getSize(); i++) {
-            square_difference = ((v[i]-regressions[i])*((v[i]-regressions[i]).getConjugate()))
-                                .getReal();
+            v = FT->transform(v);
 
-            regression_square_sum += (regressions[i]*(regressions[i].getConjugate()))
+            double relative_error = 0;
+            double regression_square_sum = 0;
+            double square_difference = 0;
+            for (size_t i = 0; i < regressions.getSize(); i++) {
+                square_difference = ((v[i]-regressions[i])*((v[i]-regressions[i]).getConjugate()))
                                     .getReal();
 
-            relative_error += square_difference;
-        }
-        relative_error = sqrt(relative_error/regression_square_sum);
+                regression_square_sum += (regressions[i]*(regressions[i].getConjugate()))
+                                         .getReal();
 
-        if (relative_error < error_threshold) {
-            exit(0);
+                relative_error += square_difference;
+            }
+            relative_error = sqrt(relative_error/regression_square_sum);
+
+            if (relative_error > error_threshold) {
+                test_result = "error";
+                exit_code = EXIT_FAILURE;
+            } else {
+                test_result = "ok";
+            }
+
+            *oss << "test " << test_number << ": " <<
+                               test_result << " " <<
+                               v.getSize() << " " <<
+                               relative_error << endl;
+            test_number++;
         }
+    } else {
+        Vector<Complex> v;
+        if ((*iss >> v).bad())
+            cerr << ERROR_MSG_CORRUPTED_DATA << endl;
+        *oss << std::setprecision(FLOAT_DIGITS) << std::fixed << FT->transform(v) << endl;
     }
 
     delete FT;
 
-    return 0;
+    return exit_code;
 }
